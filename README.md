@@ -22,8 +22,35 @@ Convolutaion Layer를 통해 Mel-Spectrogram의 이미지적 특징을 추출합
 RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 또한 STT 모델의 경우 각각의 스텝에 음성과 텍스트가 정렬되어서 나오지 않기 때문에 Loss값을 계산할 때 CTC Loss Function을 사용합니다. 
 
+<br>
 
 <img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
 
-위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있다.
+위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.다.
+물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도 파라미터도 학습에 부담이 됩니다.
+때문에 이 구조에서 RNN층을 Attention구조로 교체해 파라미터를 줄여보았습니다.
 
+<br>
+
+<img width="500" height="940" alt="Image" src="https://github.com/user-attachments/assets/0eff62db-cd50-44c5-8429-af1647db028a" />
+
+위 이미지에서 보이듯 파라미터값이 크게 줄어들어 학습에 부담이 없게 되었습니다.<br>
+
+## 데이터 선정
+본 프로젝트의 이름에서 알 수 있듯 뇌졸중 등 뇌손상으로 인한 환자들의 검사를 진행하기 때문에 대부분의 대상자들이 60대 이상의 노인분들입니다.
+때문에 STT 모델 학습에 사용될 데이터도 AIhub에서 제공하는 '자유대화 음성(노인남여)'를 사용하였습니다.
+
+## 1차 모델 구축
+꾸준히 데이터 정제, 선별과 모델 구조 조정을 했지만 프로젝트 기간내에 학습을 완료한 모델의 예측결과는 기대에 미치지 못했습니다.
+전사 문장과 예측 문장 사례는 아래와 같습니다.
+
+<전사 문장><br>
+<img width="500" height="27" alt="image" src="https://github.com/user-attachments/assets/f3952832-e15d-48c5-8b01-a7f7af7def55" />
+
+<예측 문장><br>
+<img width="500" height="22" alt="image" src="https://github.com/user-attachments/assets/d4bf5eb6-901f-42ab-98fe-2b70f595cdfb" />
+
+모델이 음성을 문자로 온전히 전사시켜야지만 모델의 결과를 통해 장애정도를 판단할 수 있습니다. 하지만 현재 정상발음도 제대로 전사하지 못하는 모습을 볼 수 있습니다.
+때문에 프로젝트 종료 후 Transformer를 학습하여 모델에 적용시킬 예정입니다.
+
+자세한 코드 전문 파일은 레포지토리에 저장되어 있습니다.
