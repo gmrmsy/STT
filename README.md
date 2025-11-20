@@ -25,9 +25,16 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 <br>
 
 <img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
+<br>
+<전사 문장><br>
+<img width="500" height="40" alt="Image" src="https://github.com/user-attachments/assets/613f9528-2d73-4173-b613-7cac1f08697c" />
 
-위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.다.
-물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도 파라미터도 학습에 부담이 됩니다.
+<예측 문장><br>
+<img width="500" height="40" alt="Image" src="https://github.com/user-attachments/assets/6182df07-0854-4904-a25a-609c91682c1a" />
+
+위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.
+물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도의 파라미터도 학습에 부담이 됩니다.
+또한 학습을 진행했을 때 예측 문장의 수준 또한 고려 대상이 되지 않을 정도로 좋지 않은것을 볼 수 있습니다.
 때문에 이 구조에서 RNN층을 Attention구조로 교체해 파라미터를 줄여보았습니다.
 
 <br>
@@ -50,7 +57,8 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 <예측 문장><br>
 <img width="500" height="22" alt="image" src="https://github.com/user-attachments/assets/d4bf5eb6-901f-42ab-98fe-2b70f595cdfb" />
 
-모델이 음성을 문자로 온전히 전사시켜야지만 모델의 결과를 통해 장애정도를 판단할 수 있습니다. 하지만 현재 정상발음도 제대로 전사하지 못하는 모습을 볼 수 있습니다.
+이전 RNN모델과 비교한다면 개선된 모습이 모이지만 모델이 음성을 문자로 온전히 전사시켜야지만 모델의 결과를 통해 장애정도를 판단할 수 있습니다.
+하지만 현재 전사된 문장도 정상발음을 제대로 전사하지 못하는 모습을 볼 수 있습니다.
 때문에 프로젝트 종료 후 Transformer를 학습하여 모델에 적용시킬 예정입니다.
 
 자세한 코드 전문 파일은 레포지토리에 저장되어 있습니다.
