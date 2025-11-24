@@ -27,10 +27,10 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 <img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
 <br>
 <전사 문장><br>
-<img width="500" height="40" alt="Image" src="https://github.com/user-attachments/assets/613f9528-2d73-4173-b613-7cac1f08697c" />
+<img width="500" height="26" alt="Image" src="https://github.com/user-attachments/assets/2a22d4b9-bc82-4d30-a4c8-8ed0a110272e" />
 
 <예측 문장><br>
-<img width="500" height="40" alt="Image" src="https://github.com/user-attachments/assets/6182df07-0854-4904-a25a-609c91682c1a" />
+<img width="500" height="24" alt="Image" src="https://github.com/user-attachments/assets/98536fd2-4325-4665-9c78-c3bf6998047a" />
 
 위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.
 물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도의 파라미터도 학습에 부담이 됩니다.
@@ -52,10 +52,10 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 전사 문장과 예측 문장 사례는 아래와 같습니다.
 
 <전사 문장><br>
-<img width="500" height="27" alt="image" src="https://github.com/user-attachments/assets/f3952832-e15d-48c5-8b01-a7f7af7def55" />
+<img width="500" height="26" alt="Image" src="https://github.com/user-attachments/assets/2a22d4b9-bc82-4d30-a4c8-8ed0a110272e" />
 
 <예측 문장><br>
-<img width="500" height="22" alt="image" src="https://github.com/user-attachments/assets/d4bf5eb6-901f-42ab-98fe-2b70f595cdfb" />
+<img width="500" height="23" alt="Image" src="https://github.com/user-attachments/assets/614ed6fe-bb56-4e00-981d-d98b8af85a10" />
 
 이전 RNN모델과 비교한다면 개선된 모습이 모이지만 모델이 음성을 문자로 온전히 전사시켜야지만 모델의 결과를 통해 장애정도를 판단할 수 있습니다.
 하지만 현재 전사된 문장도 정상발음을 제대로 전사하지 못하는 모습을 볼 수 있습니다.
