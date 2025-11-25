@@ -31,10 +31,12 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 <img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
 <br>
 <전사 문장><br>
-<img width="500" height="26" alt="Image" src="https://github.com/user-attachments/assets/2a22d4b9-bc82-4d30-a4c8-8ed0a110272e" />
+<img width="500" height="24" alt="Image" src="https://github.com/user-attachments/assets/234ad4ed-010d-499c-9370-fa855af7e684" />
+<img width="500" height="40" alt="Image" src="https://github.com/user-attachments/assets/aa34fee3-420d-4e01-82fd-d444d66b748b" />
 
 <예측 문장><br>
-<img width="500" height="24" alt="Image" src="https://github.com/user-attachments/assets/98536fd2-4325-4665-9c78-c3bf6998047a" />
+<img width="500" height="23" alt="Image" src="https://github.com/user-attachments/assets/6b7af473-c2fe-4f0c-a0d4-7a87610e76d4" />
+<img width="500" height="26" alt="Image" src="https://github.com/user-attachments/assets/7b5fb8bf-5ec1-4956-8aae-4d9a774294b2" />
 
 위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.
 물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도의 파라미터도 학습에 부담이 됩니다.
