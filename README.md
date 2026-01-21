@@ -40,18 +40,49 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 <img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
 <br>
 <전사 문장><br>
-<img width="500" height="24" alt="Image" src="https://github.com/user-attachments/assets/234ad4ed-010d-499c-9370-fa855af7e684" />
-<img width="500" height="40" alt="Image" src="https://github.com/user-attachments/assets/aa34fee3-420d-4e01-82fd-d444d66b748b" />
+<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/234ad4ed-010d-499c-9370-fa855af7e684" />
+<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/aa34fee3-420d-4e01-82fd-d444d66b748b" />
 
 <예측 문장><br>
-<img width="500" height="23" alt="Image" src="https://github.com/user-attachments/assets/6b7af473-c2fe-4f0c-a0d4-7a87610e76d4" />
-<img width="500" height="26" alt="Image" src="https://github.com/user-attachments/assets/7b5fb8bf-5ec1-4956-8aae-4d9a774294b2" />
+<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/6b7af473-c2fe-4f0c-a0d4-7a87610e76d4" />
+<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/7b5fb8bf-5ec1-4956-8aae-4d9a774294b2" />
+
+<DeepSpeech2 모델의 CER 분포><br>
+<img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/ac17cca9-0a48-4788-acec-6cb07c4a7a10" />
 
 위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.
 물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도의 파라미터도 학습에 부담이 됩니다.
-학습을 진행했을 때 예측 문장이 어느정도 전사가 잘 되지만 CER을 확인한 결과 0.3619으로 확인되어 좀 더 정교한 정확도가 필요해보입니다.
+학습을 진행했을 때 예측 문장이 어느정도 전사가 잘 되지만 DeepSpeech2의 평균 CER을 확인한 결과 0.3652으로 확인되어 좀 더 정교한 정확도가 필요해보입니다.
 때문에 이 구조에서 더 개선된 모델을 구축하기 위해 단순히 RNN레이어의 반복이 아닌 Transformer의 어텐션 기술사용해 모델을 구축 후 학습하여 성능을 높여볼 예정입니다.
 
 ## Simple-Attention
+<img width="500" height="356" alt="Image" src="https://github.com/user-attachments/assets/6825b908-8e49-42d0-8223-3db24fae4d51" />
+
+위 이미지는 Convolution Layer, Recurrent Neural Network(GRU), Self_Attention을 사용해 구축한 STT모델을 도식화한 이미지입니다.
+DeepSpeech2의 Convolution Layer를 통해 Mel_spectrogram의 이미지적 특징을 추출 후 GRU Layer로 이어지는 흐름을 차용하여 그 후 Self-Attention과 GRU Layer를 반복해 모델을 구축했습니다.
+이로인해 음소/문자 단위 예측에 유리한 시퀀스 표현(representation)을 학습하고, 인식 정확도를 높이기 위한 특징을 추출하였습니다.
+
+<br>
+
+<img width="500" height="56" alt="Image" src="https://github.com/user-attachments/assets/6c915ca9-fa53-4f75-a076-b0d33db28df2" />
+<br>
+<전사 문장><br>
 
 
+<예측 문장><br>
+
+
+<DeepSpeech2, Simple-Attention 모델의 CER 분포><br>
+<img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/33f8158d-a8bb-42a5-82e3-33bcf7e75456" />
+
+위 그래프에서 알 수 있듯 DeepSpeech2 모델보다 Attention을 사용한 모델의 CER이 더 낮게 분포되어있는것을 알 수 있습니다.
+실제 수치를 봤을 때 Simple-Attention 모델의 평균 CER은 0.267403으로 DeepSpeech2 모델보다 더 성능이 향상되었고 추후 발전의 가능성을 볼 수 있다고 생각이 들었습니다.
+하지만 프로젝트의 기간이 다 되어 프로젝트 중 진행한 STT모델의 개발은 여기서 멈춰졌고 결국 프로젝트에는 사용할 수 없었습니다.
+때문에 프로젝트 후 계속해서 Transformer와 다른 STT 모델의 특성을 조사하여 발전시켜나아갈 예정입니다.
+
+
+## Transformer
+<img width="500" height="721" alt="Image" src="https://github.com/user-attachments/assets/89d68095-e49a-4a04-9020-48bb3d5e95de" />
+
+AI를 공부한다면 모를 수 없는 Tranformer 모델의 구조입니다.
+프로젝트 종료 후 Transformer에 대한 조사를 진행한 후 그 구조를 STT 모델에 적용하여 개발을 진행하였습니다.
