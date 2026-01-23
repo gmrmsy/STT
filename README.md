@@ -40,12 +40,10 @@ RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
 <img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
 <br>
 <전사 문장><br>
-<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/234ad4ed-010d-499c-9370-fa855af7e684" />
-<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/aa34fee3-420d-4e01-82fd-d444d66b748b" />
+<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/8a7f1dec-1d4c-4f59-8bbb-00b98a1326f6" />
 
 <예측 문장><br>
-<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/6b7af473-c2fe-4f0c-a0d4-7a87610e76d4" />
-<img width="500" height="25" alt="Image" src="https://github.com/user-attachments/assets/7b5fb8bf-5ec1-4956-8aae-4d9a774294b2" />
+<img width="462" height="15" alt="Image" src="https://github.com/user-attachments/assets/1dd12a47-3fb9-4060-8953-ce5a45f5290b" />
 
 <DeepSpeech2 모델의 CER 분포><br>
 <img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/ac17cca9-0a48-4788-acec-6cb07c4a7a10" />
@@ -67,10 +65,10 @@ DeepSpeech2의 Convolution Layer를 통해 Mel_spectrogram의 이미지적 특�
 <img width="500" height="56" alt="Image" src="https://github.com/user-attachments/assets/6c915ca9-fa53-4f75-a076-b0d33db28df2" />
 <br>
 <전사 문장><br>
-
+<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/8a7f1dec-1d4c-4f59-8bbb-00b98a1326f6" />
 
 <예측 문장><br>
-
+<img width="463" height="15" alt="Image" src="https://github.com/user-attachments/assets/bd5bda8b-dfb7-42bb-a42b-363f36a21e15" />
 
 <DeepSpeech2, Simple-Attention 모델의 CER 분포><br>
 <img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/33f8158d-a8bb-42a5-82e3-33bcf7e75456" />
@@ -84,5 +82,19 @@ DeepSpeech2의 Convolution Layer를 통해 Mel_spectrogram의 이미지적 특�
 ## Transformer
 <img width="500" height="721" alt="Image" src="https://github.com/user-attachments/assets/89d68095-e49a-4a04-9020-48bb3d5e95de" />
 
-AI를 공부한다면 모를 수 없는 Tranformer 모델의 구조입니다.
-프로젝트 종료 후 Transformer에 대한 조사를 진행한 후 그 구조를 STT 모델에 적용하여 개발을 진행하였습니다.
+AI를 공부한다면 모를 수 없는 Tranformer 모델의 구조입니다. 프로젝트 종료 후 Transformer에 대한 조사를 진행한 후 그 구조를 STT 모델에 적용하여 개발을 진행하였습니다.
+Attention is all you need에서 사용한 모델의 구조를 똑같이 차용하였고 거기에서 Input Data에는 음성데이터, Output Data에는 전사된 문장데이터를 자소토큰으로 토큰화한 데이터를 넣어서 학습을 진행했습니다.
+
+<전사 문장><br>
+<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/8a7f1dec-1d4c-4f59-8bbb-00b98a1326f6" />
+
+<예측 문장><br>
+<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/1aaa09ef-c887-4658-8046-7395706f3c94" />
+
+<DeepSpeech2, Simple-Attention, Transformer 모델의 CER 분포><br>
+<img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/daf68b57-f6a4-46dc-aea4-887d3cf384e6" />
+
+CER을 확인해 본 결과 중앙값, 평균 등 대표값은 Transformer 모델이 제일 낮게 확인되지만 분산값은 Transformer 모델이 제일 큰 것을 확인 할 수 있습니다.
+이런 결과의 원인으로는 Transformer 모델의 복잡성을 살려내기에 사용한 141,658개의 데이터(약 20GB)의 규모(Volume)가 충분하지 않았던 것으로 보입니다.
+그리고 Attention 기반 Encoder–Decoder E2E STT는 입력–출력 정렬을 모델이 잠재적으로 학습해야 하므로, 단조 정렬 가정을 두고 모든 정렬을 합산하는 CTC 기반 모델보다 초기 학습이 불안정해질 수 있습니다.
+또한 Transformer의 특성상 파라미터의 민감도가 높기 때문에 이에 맞는 튜닝을 다양하게 진행해야하는 것으로 보입니다.
