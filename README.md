@@ -1,108 +1,83 @@
+### 뇌졸중 후 마비말장애 평가를 보조하기 위해 정상 발화 기반 한국어 STT baseline을 구축하고,<br>자소 단위 전사를 통해 발음 오류를 정량화할 가능성과 실제 환경 일반화 한계를 함께 분석한 프로젝트입니다.
+
 # 개요
 
-뇌졸중 후 언어장애 진단을 위한 딥러닝 기반 언어 기능 평가 서비스 개발(이하 언어 평가 모델 개발) 프로젝트 진행 중 제가 맡은 검사항목들은 마비말장애 검사에 해당하는 항목들이었습니다. <br>
-인지-언어 연결 능력(듣기·이해·표현)을 평가하는 실어증 항목과 달리 마비말장애 검사 항목은 발성·조음 및 구강 근육 사용 능력을 평가하는 항목이기 때문에 음성을 통한 정확한 텍스트 전달이 중점된 항목이라 생각했습니다.
-때문에 STT모델을 통해 음성을 텍스트로 전환하고 그 전환된 텍스트의 정확도가 곧 검사점수와 같아야한다고 판단했습니다.
-더 나아가 자음과 모음의 디테일한 발음을 확인하는 검사인 만큼 음절, 단어, 형태소 등으로 전사된 STT보다 자소단위(ex. 안녕 -> ㅇㅏㄴㄴㅕㅇ)로 전사된 STT를 사용하는 것이 적합하다고 판단했습니다.
+본 프로젝트는 뇌졸중 등 뇌손상 이후 나타나는 언어장애 평가를 보조하기 위한 음성 기반 AI 시스템을 목표로 시작했습니다.
+제가 맡은 영역은 마비말장애 검사와 연관된 발성·조음 능력 평가였으며 발화를 텍스트로 안정적으로 전사할 수 있다면 정상 발화 대비 발음 오류를 정량적으로 관찰할 수 있다고 판단했습니다.
+다만 STT 결과를 임상 점수와 직접 동일시하기보다는 정상 발화 대비 오류 정도를 측정하기 위한 1차 보조지표로 활용하는 방향이 더 적절하다고 보았습니다.
+특히 이 프로젝트에서는 음절 단위보다 더 세밀한 발음 차이를 반영하기 위해 자소 단위 전사(ex. 안녕 → ㅇㅏㄴㄴㅕㅇ)를 적용했습니다.<br>
+
+<br>
 
 <img width="500" height="223" alt="Image" src="https://github.com/user-attachments/assets/b83eff57-bacd-4fa8-ad02-4f8407515197" />
 
-<br><br>
+<br>
 
 때문에 언어 평가 모델 개발 프로젝트를 진행하며 동시에 STT를 구축하기 위해 병행하며 진행했습니다.
 영어 기반의 STT는 흔히 있지만 한글 기반의 Pretrain된 모델은 Kospeech외에 찾기가 어려웠습니다.
 때문에 DeepSpeech2 기반의 Kospeech모델을 토대로 STT 모델을 구축하기 시작했습니다.
 
+해당 STT모델 개발하기 위해 제가 수행한 역할은 다음과 같습니다.
+1) AI Hub 음성 데이터셋 조건 정의 및 학습 데이터 선별
+2) 한국어 자소 단위 토큰화 및 전처리 파이프라인 구성
+3) DeepSpeech2 기반 baseline 구현
+4) GRU + Self-Attention 기반 Simple-Attention 모델 구현
+5) Transformer 기반 STT 모델 구현 및 성능 비교
+6) CER(Character Error Rate) 중심 정량 평가 및 오류 분포 분석
+  
+<br>
+
 ## 데이터 선정 및 전처리
 본 프로젝트의 이름에서 알 수 있듯 뇌졸중 등 뇌손상으로 인한 환자들의 검사를 진행하기 때문에 대부분의 대상자들이 60대 이상의 노인분들입니다.
 때문에 STT 모델 학습에 사용될 데이터도 AIhub에서 제공하는 '자유대화 음성(노인남여)'를 사용하였습니다.
 해당 데이터는 1,000명 이상의 발화자를 대상으로 3,000여 시간 이상의 음성데이터로 이루어져있습니다.
-하지만 총 306.87 GB의 모든 데이터를 사용하는것은 현재 사용하는 Colab의 리소스적인 부분에서 불가능하다 판단했습니다.
-때문에 몇 가지 조건을 가지고 데이터를 정제하여 사용하였습니다.
+전체 데이터는 약 306.87GB 규모였기 때문에 Colab 환경에서 전체 학습은 현실적으로 어려웠고 아래 조건으로 데이터를 정제했습니다.
 
 1) 검사 항목에 사용하는 발음을 포함하는 문장
-2) 검사 항목과 길이가 비슷한 문장 (2초 이상 AND 10초 이하)
-3) 전사된 문장에 (SP:대상포), (NO:첨단지구), (FP:뭐) 등 불명확한 음성에 대한 특수토큰을 포함하지 않는 문장
+2) 검사 항목과 길이가 비슷한 문장 (2초 이상, 10초 이하)
+3) 불명확 발화 특수 토큰((SP:대상포), (NO:첨단지구), (FP:뭐))이 포함되지 않은 문장
 
-이렇게 세 가지 조건에 해당하는 문장을 선별하여 총 141,658개의 데이터를 가지고 학습을 진행하였습니다.
-또한 데이터는 RecoderID가 각각에게 배분된 문장을 읽기 때문에 같은 문장이 다수 존재하는것으로 확인되었습니다.
-때문에 같은 문장은 Test, Validation, Test set에 약 8:1:1의 비율로 분배하여 각 문장이 충분히 학습될 수 있게 하였습니다.
+이 기준으로 총 141,658개 발화를 선별했습니다.
+또한 동일 문장이 여러 화자에게 반복 녹음된 구조를 고려해 문장 기준으로 Train / Validation / Test = 8 : 1 : 1 분할을 적용했습니다.
 
-## DeepSpeech2
+## 모델 구성
+
+### 1. DeepSpeech2
 <img width="500" height="490" alt="Image" src="https://github.com/user-attachments/assets/b7c46ed7-8909-4ebc-bd3e-65bb1030215b" />
 
-DeepSpeech2의 구조는 위 그림과 같습니다.
-Convolutaion Layer를 통해 Mel-Spectrogram의 이미지적 특징을 추출합니다. 이는 음성적 특징을 추출하는 것과 흡사하다 할 수 있습니다.
-특징이 추출된 데이터는 시간의 흐름에 따라 바뀌는 발화를 분석하기 위해 Recurrent Neural Network(GRU)를 거치게 됩니다.
-RNN 레이어를 거친 데이터를 Fully Conected Layer로 처리합니다.
-또한 STT 모델의 경우 각각의 스텝에 음성과 텍스트가 정렬되어서 나오지 않기 때문에 Loss값을 계산할 때 CTC Loss Function을 사용합니다. 
+CNN으로 Mel-Spectrogram 특징을 추출하고, GRU 기반 RNN으로 시계열 정보를 학습한 뒤, CTC Loss를 통해 입력-출력 정렬 없이 문장을 예측하는 baseline 모델입니다.
 
-<br>
-
-<img width="500" height="52" alt="Image" src="https://github.com/user-attachments/assets/282f2db8-1e86-4d0c-99dd-c2bbfe809118" />
-<br>
-<전사 문장><br>
-<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/8a7f1dec-1d4c-4f59-8bbb-00b98a1326f6" />
-
-<예측 문장><br>
-<img width="462" height="15" alt="Image" src="https://github.com/user-attachments/assets/1dd12a47-3fb9-4060-8953-ce5a45f5290b" />
-
-<DeepSpeech2 모델의 CER 분포><br>
-<img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/ac17cca9-0a48-4788-acec-6cb07c4a7a10" />
-
-위 처럼 DeepSpeech2를 기반으로 Tensorflow로 모델을 구축할 경우 파라미터값이 매우 많은걸 볼 수 있습니다.
-물론 메이저한 딥러닝 모델들과 비교한다면 굉장히 적은 편이지만 리소스와 컴퓨팅 파워가 부족한 입장에서 이 정도의 파라미터도 학습에 부담이 됩니다.
-학습을 진행했을 때 예측 문장이 어느정도 전사가 잘 되지만 DeepSpeech2의 평균 CER을 확인한 결과 0.3652으로 확인되어 좀 더 정교한 정확도가 필요해보입니다.
-때문에 이 구조에서 더 개선된 모델을 구축하기 위해 단순히 RNN레이어의 반복이 아닌 Transformer의 어텐션 기술사용해 모델을 구축 후 학습하여 성능을 높여볼 예정입니다.
-
-## Simple-Attention
+### 2. Simple-Attention
 <img width="500" height="356" alt="Image" src="https://github.com/user-attachments/assets/6825b908-8e49-42d0-8223-3db24fae4d51" />
 
-위 이미지는 Convolution Layer, Recurrent Neural Network(GRU), Self_Attention을 사용해 구축한 STT모델을 도식화한 이미지입니다.
-DeepSpeech2의 Convolution Layer를 통해 Mel_spectrogram의 이미지적 특징을 추출 후 GRU Layer로 이어지는 흐름을 차용하여 그 후 Self-Attention과 GRU Layer를 반복해 모델을 구축했습니다.
-이로인해 음소/문자 단위 예측에 유리한 시퀀스 표현(representation)을 학습하고, 인식 정확도를 높이기 위한 특징을 추출하였습니다.
-
-<br>
-
-<img width="500" height="56" alt="Image" src="https://github.com/user-attachments/assets/6c915ca9-fa53-4f75-a076-b0d33db28df2" />
-<br>
-<전사 문장><br>
-<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/8a7f1dec-1d4c-4f59-8bbb-00b98a1326f6" />
-
-<예측 문장><br>
-<img width="463" height="15" alt="Image" src="https://github.com/user-attachments/assets/bd5bda8b-dfb7-42bb-a42b-363f36a21e15" />
-
-<DeepSpeech2, Simple-Attention 모델의 CER 분포><br>
-<img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/33f8158d-a8bb-42a5-82e3-33bcf7e75456" />
-
-위 그래프에서 알 수 있듯 DeepSpeech2 모델보다 Attention을 사용한 모델의 CER이 더 낮게 분포되어있는것을 알 수 있습니다.
-실제 수치를 봤을 때 Simple-Attention 모델의 평균 CER은 0.267403으로 DeepSpeech2 모델보다 더 성능이 향상되었고 추후 발전의 가능성을 볼 수 있다고 생각이 들었습니다.
-하지만 프로젝트의 기간이 다 되어 프로젝트 중 진행한 STT모델의 개발은 여기서 멈춰졌고 결국 프로젝트에는 사용할 수 없었습니다.
-때문에 프로젝트 후 계속해서 Transformer와 다른 STT 모델의 특성을 조사하여 발전시켜나아갈 예정입니다.
+DeepSpeech2의 CNN + GRU 흐름을 유지하되, Self-Attention을 추가하여 자소/문자 단위 예측에 유리한 시퀀스 표현을 학습하도록 설계했습니다.
 
 
-## Transformer
+### 3. Transformer
 <img width="500" height="721" alt="Image" src="https://github.com/user-attachments/assets/89d68095-e49a-4a04-9020-48bb3d5e95de" />
 
-AI를 공부한다면 모를 수 없는 Tranformer 모델의 구조입니다. 프로젝트 종료 후 Transformer에 대한 조사를 진행한 후 그 구조를 STT 모델에 적용하여 개발을 진행하였습니다.
-Attention is all you need에서 사용한 모델의 구조를 똑같이 차용하였고 거기에서 Input Data에는 음성데이터, Output Data에는 전사된 문장데이터를 자소토큰으로 토큰화한 데이터를 넣어서 학습을 진행했습니다.
+Attention 기반 Encoder–Decoder 구조를 STT에 적용한 모델입니다.<br>
+입력은 음성 특징, 출력은 자소 토큰 시퀀스로 구성하여, 장거리 의존성과 문맥 반영 능력을 강화하고자 했습니다.
 
-<전사 문장><br>
-<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/8a7f1dec-1d4c-4f59-8bbb-00b98a1326f6" />
 
-<예측 문장><br>
-<img width="456" height="15" alt="Image" src="https://github.com/user-attachments/assets/1aaa09ef-c887-4658-8046-7395706f3c94" />
+## 주요결과
 
 <DeepSpeech2, Simple-Attention, Transformer 모델의 CER 분포><br>
 <img width="500" height="377" alt="Image" src="https://github.com/user-attachments/assets/daf68b57-f6a4-46dc-aea4-887d3cf384e6" />
 
-Transformer를 기반으로 한 STT모델의 CER은 0.2603로 확인되었으며, 중앙값, 평균 등 대표값은 Transformer 모델이 제일 낮게 확인되었습니다.
-20,511개 Test Set 중 CER이 0인 항목의 개수는 DeepSpeech2 9개, Simple-Attention 47개, Transformer 3,459개로 Transformer 모델의 비율이 크게 높았습니다.
+내부 Test set 기준 평균 CER은 다음과 같았습니다.
+- DeepSpeech2: 0.3652
+- Simple-Attention: 0.267403
+- Transformer: 0.2603
 
-하지만 분산값은 Transformer 모델이 제일 크고 그래프상 전체 범위와 사분위범위가 Simple-Attention모델보다 Transformer모델이 넓기 때문에 특정 조건의 발화에서 성능이 크게 무너지는 케이스가 있는것으로 보입니다.
-이런 결과의 원인으로는 텍스트 정규화/라벨 노이즈/도메인 다양성 등의 요인으로 인해 Transformer의 잠재력이 충분히 발휘되지 않았을 가능성과 Transformer 모델의 복잡성을 살려내기에 사용한 141,658개의 데이터(약 20GB)의 규모(Volume)가 부족했을 가능성이 고려되었습니다.
-또한 단조 정렬 가정을 두고 모든 정렬을 합산하는 CTC 기반 모델에 비해 Attention 기반 Encoder–Decoder E2E STT는 입력–출력 정렬을 모델이 잠재적으로 학습해야 하므로 일부 샘플에서 정렬 실패/연쇄 오류가 발생할 수 있기 때문에 분산이 크게 형성된것으로 보입니다.
+Transformer가 평균 및 중앙값 기준으로 가장 낮은 CER을 보였으며, CER 0 샘플 수 역시 3,459개로 가장 많았습니다.
+반면 분산은 Transformer가 가장 크게 나타나, 일부 샘플에서는 성능이 급격히 무너지는 불안정성도 함께 확인되었습니다.
 
-위를 토대로 먼저 데이터를 다시 살펴보아 학습을 위해 전처리를 진행해야할 부분을 확인하고, 추가적으로 모델에 개선을 해야할 분이 없는지 확인해봐야겠습니다.
 
-## 데이터 다시 살피기
+## 결과해석
+
+이 실험을 통해 단순한 RNN 기반 구조보다 Attention 기반 구조가 한국어 자소 단위 STT에서 더 나은 성능을 낼 수 있음을 확인했습니다.
+특히 Transformer는 내부 Test set에서 가장 우수한 평균 성능을 보였기 때문에, 자소 단위 발음 분석의 baseline 모델로서 가능성을 보여주었습니다.
+
+하지만 실제로 직접 녹음한 외부 음성을 입력했을 때는 내부 Test set보다 전사 품질이 크게 저하되었습니다.
+이 경험은 이 프로젝트가 단순히 “STT를 잘 만든 프로젝트”라기보다, 데이터셋 내부 성능과 실제 사용 환경 성능의 차이를 검증한 프로젝트라는 점을 보여줍니다.
