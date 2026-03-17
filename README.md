@@ -38,31 +38,36 @@ https://gmrmsy.github.io/STT_test_site_1/
 전체 데이터는 약 306.87GB 규모였기 때문에 Colab 환경에서 전체 학습은 현실적으로 어려웠고 아래 조건으로 데이터를 정제했습니다.
 
 1) 검사 항목에 사용하는 발음을 포함하는 문장
-2) 검사 항목과 길이가 비슷한 문장 (2초 이상, 10초 이하)
+2) 검사 항목과 길이가 비슷한 문장 (2초 초과, 10초 이하)
 3) 불명확 발화 특수 토큰((SP:대상포), (NO:첨단지구), (FP:뭐))이 포함되지 않은 문장
+
+<a href="https://github.com/gmrmsy/STT/blob/main/1)data_select.ipynb">데이터 선정 코드 보기</a>
 
 이 기준으로 총 141,658개 발화를 선별했습니다.
 또한 동일 문장이 여러 화자에게 반복 녹음된 구조를 고려해 문장 기준으로 Train / Validation / Test = 8 : 1 : 1 분할을 적용했습니다.
+
+<a href="https://github.com/gmrmsy/STT/blob/main/2)data_preprocessing.ipynb">데이터 전처리 코드 보기</a>
 
 ## 모델 구성
 
 ### 1. DeepSpeech2
 <img width="500" height="490" alt="Image" src="https://github.com/user-attachments/assets/b7c46ed7-8909-4ebc-bd3e-65bb1030215b" />
 
-CNN으로 Mel-Spectrogram 특징을 추출하고, GRU 기반 RNN으로 시계열 정보를 학습한 뒤, CTC Loss를 통해 입력-출력 정렬 없이 문장을 예측하는 baseline 모델입니다.
+CNN으로 Mel-Spectrogram 특징을 추출하고, GRU 기반 RNN으로 시계열 정보를 학습한 뒤, CTC Loss를 통해 입력-출력 정렬 없이 문장을 예측하는 baseline 모델입니다.<br>
+<a href="https://github.com/gmrmsy/STT/blob/main/3)ds2_train.ipynb">DeepSpeech2 모델 구현 및 학습 코드 보기</a>
 
 ### 2. Simple-Attention
 <img width="500" height="356" alt="Image" src="https://github.com/user-attachments/assets/6825b908-8e49-42d0-8223-3db24fae4d51" />
 
-DeepSpeech2의 CNN + GRU 흐름을 유지하되, Self-Attention을 추가하여 자소/문자 단위 예측에 유리한 시퀀스 표현을 학습하도록 설계했습니다.
-
+DeepSpeech2의 CNN + GRU 흐름을 유지하되, Self-Attention을 추가하여 자소/문자 단위 예측에 유리한 시퀀스 표현을 학습하도록 설계했습니다.<br>
+<a href="https://github.com/gmrmsy/STT/blob/main/4)Simple_Attention_train.ipynb">Simple-Attention 모델 구현 및 학습 코드 보기</a>
 
 ### 3. Transformer
 <img width="500" height="721" alt="Image" src="https://github.com/user-attachments/assets/89d68095-e49a-4a04-9020-48bb3d5e95de" />
 
 Attention 기반 Encoder–Decoder 구조를 STT에 적용한 모델입니다.<br>
-입력은 음성 특징, 출력은 자소 토큰 시퀀스로 구성하여, 장거리 의존성과 문맥 반영 능력을 강화하고자 했습니다.
-
+입력은 음성 특징, 출력은 자소 토큰 시퀀스로 구성하여, 장거리 의존성과 문맥 반영 능력을 강화하고자 했습니다.<br>
+<a href="https://github.com/gmrmsy/STT/blob/main/5)Transformer_train.ipynb">Transformer 모델 구현 및 학습 코드 보기</a>
 
 ## 주요결과
 
