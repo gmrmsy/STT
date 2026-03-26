@@ -1,5 +1,11 @@
 ### 뇌졸중 후 마비말장애 평가를 보조하기 위해 정상 발화 기반 한국어 STT baseline을 구축하고,<br>자소 단위 전사를 통해 발음 오류를 정량화할 가능성과 실제 환경 일반화 한계를 함께 분석한 프로젝트입니다.
 
+자소 단위 전사를 활용해 발음 오류를 정량적으로 확인할 수 있는지 탐색했으며, 동시에 실제 녹음 환경에서의 일반화 한계도 함께 분석했습니다.<br>
+내부 Test set 기준 각 모델별 평균 CER은 다음과 같았습니다.<br>
+- DeepSpeech2: 0.3652
+- Simple-Attention: 0.267403
+- Transformer: 0.2603
+
 아래 사이트에 접속하시면 Simple-Attention모델과 Transformer모델을 사용해 보실 수 있습니다.<br>
 https://gmrmsy.github.io/STT_test_site_1/
 
